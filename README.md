@@ -49,3 +49,7 @@ Run the script from your terminal:
 
 ```bash
 python main.py
+
+
+⚠️ Disclaimer
+This tool is for educational purposes only. Use it responsibly and in accordance with Real Debrid's Terms of Service.
