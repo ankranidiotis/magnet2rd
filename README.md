@@ -64,6 +64,8 @@ For those who prefer the terminal.
    ```bash
    python main.py
    ```
+4. Enter your magnet link and download directory.
+5. Wait for the download to complete.
 
 ---
 
