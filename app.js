@@ -35,21 +35,17 @@ async function rdRequest(endpoint, method = 'GET', body = null) {
     // Save token
     localStorage.setItem('rd_token', token);
 
-    const headers = {
-        "Authorization": `Bearer ${token}`
-    };
-
-    const options = {
-        method,
-        headers
-    };
+    const fullUrl = `${RD_API_BASE}${endpoint}`;
+    const headers = { "Authorization": `Bearer ${token}` };
+    const options = { method, headers };
 
     if (body) {
         options.body = new URLSearchParams(body);
     }
 
+    // Try Direct Request First
     try {
-        const response = await fetch(`${RD_API_BASE}${endpoint}`, options);
+        const response = await fetch(fullUrl, options);
         if (!response.ok) {
             const errData = await response.json().catch(() => ({}));
             throw new Error(errData.error || `HTTP Error ${response.status}`);
@@ -57,10 +53,30 @@ async function rdRequest(endpoint, method = 'GET', body = null) {
         if (response.status === 204) return null;
         return await response.json();
     } catch (err) {
-        if (err.message.includes('Failed to fetch')) {
-            throw new Error("CORS Error: Real-Debrid API blocked the request. Please use a CORS-unblocking browser extension or a proxy.");
+        // If it's a CORS error (Failed to fetch), try the Proxy
+        if (err.message.includes('Failed to fetch') || err.message.includes('CORS')) {
+            console.warn("Direct request blocked by CORS, trying proxy...");
+            return await rdProxyRequest(fullUrl, options);
         }
         throw err;
+    }
+}
+
+// Helper: Proxy Request Fallback
+async function rdProxyRequest(url, options) {
+    // Using corsproxy.io as a reliable public proxy
+    const proxyUrl = `https://corsproxy.io/?${encodeURIComponent(url)}`;
+
+    try {
+        const response = await fetch(proxyUrl, options);
+        if (!response.ok) {
+            const errData = await response.json().catch(() => ({}));
+            throw new Error(errData.error || `Proxy Error: ${response.status}`);
+        }
+        if (response.status === 204) return null;
+        return await response.json();
+    } catch (err) {
+        throw new Error("CORS Proxy failed. Please use a CORS-unblocking browser extension or try again later.");
     }
 }
 
