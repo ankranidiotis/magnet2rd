@@ -1,55 +1,74 @@
-# Real Debrid Magnet Unrestricter (CLI)
+# Magnet2RD
 
-A lightweight Python command-line tool that automatically converts Torrent Magnet Links into high-speed, direct download links using the [Real Debrid](https://real-debrid.com/) API.
+Magnet2RD is a powerful, lightweight tool that converts Torrent Magnet Links into high-speed, direct download links using the [Real Debrid](https://real-debrid.com/) API. 
 
-This tool automates the manual workflow:
-1.  **Adds** the magnet link to your Real Debrid cloud.
-2.  **Selects** the largest file (usually the main movie) automatically.
-3.  **Unrestricts** the link to generate a direct HTTPs download URL.
+It is available as both a **Command Line Interface (CLI)** and a **Modern Static Web App**.
 
-> **Note:** This tool bypasses the common `403 Forbidden` errors on the `/instantAvailability` endpoint by using the direct "Add & Check" method.
+---
 
-## 🚀 Features
+## ✨ Features
 
-* **Instant Conversion:** Paste a magnet link, get a direct download link.
-* **Auto-Selection:** automatically identifies and selects the largest video file in a torrent.
-* **Secure:** Uses environment variables to keep your API Token safe.
-* **Lightweight:** Runs entirely in the terminal with minimal dependencies.
+- **Instant Conversion**: Paste a magnet link, get a direct download link instantly.
+- **Auto-Selection**: Automatically identifies and selects the largest video file (the main movie) in a torrent.
+- **High Speed**: Leverages Real Debrid's high-speed servers for your downloads.
+- **Glassmorphic UI**: (Web) A premium, modern interface with smooth animations.
+- **Secure**: 
+  - (CLI) Uses environment variables (`.env`) for API safety.
+  - (Web) Stores your token only in your browser's `localStorage`.
 
-## 🛠️ Prerequisites
+---
 
-* Python 3.x installed.
-* A Premium [Real Debrid](https://real-debrid.com/) account.
-* Your API Token (Get it from [https://real-debrid.com/apitoken](https://real-debrid.com/apitoken)).
+## 🌐 Web App (Recommended)
 
-## 📦 Installation
+The web app provides a user-friendly interface that can be hosted on GitHub Pages.
 
-1.  **Clone the repository:**
-    ```bash
-    git clone [https://github.com/YOUR_USERNAME/rd-magnet-unrestricter.git](https://github.com/YOUR_USERNAME/rd-magnet-unrestricter.git)
-    cd rd-magnet-unrestricter
-    ```
+### How to Run Locally
+1. Ensure you have Node.js installed.
+2. Install dependencies:
+   ```bash
+   npm install
+   ```
+3. Start the development server:
+   ```bash
+   npm run dev
+   ```
+4. Open the provided `localhost` URL in your browser.
 
-2.  **Install dependencies:**
-    ```bash
-    pip install -r requirements.txt
-    ```
+### Deployment
+1. Build the production files:
+   ```bash
+   npm run build
+   ```
+2. The `dist/` folder contains the ready-to-host static files.
 
-3.  **Configure Security:**
-    * Create a file named `.env` in the root folder.
-    * Add your API token inside it:
-        ```ini
-        RD_API_TOKEN=your_real_debrid_api_token_here
-        ```
-    * *Note: This file is ignored by Git to protect your account.*
+---
 
-## 🖥️ Usage
+## 🖥️ Command Line Interface (CLI)
 
-Run the script from your terminal:
+For those who prefer the terminal.
 
-```bash
-python main.py
+### Prerequisites
+- Python 3.x installed.
+- `requests` and `python-dotenv` packages.
 
+### Installation & Usage
+1. Install dependencies:
+   ```bash
+   pip install -r requirements.txt
+   ```
+2. Create a `.env` file in the root directory:
+   ```env
+   RD_API_TOKEN=your_real_debrid_api_token_here
+   ```
+3. Run the tool:
+   ```bash
+   python main.py
+   ```
 
-⚠️ Disclaimer
+---
+
+## ⚠️ Disclaimer
+
 This tool is for educational purposes only. Use it responsibly and in accordance with Real Debrid's Terms of Service.
+
+&copy; 2025 [NassosKranidiotis](https://nassoskranidiotis.com). All rights reserved.
