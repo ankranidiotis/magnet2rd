@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Magnet2RD | Fast Real-Debrid Downloader</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <div class="background-blobs">
+        <div class="blob blob-1"></div>
+        <div class="blob blob-2"></div>
+        <div class="blob blob-3"></div>
+    </div>
+
+    <main class="container">
+        <header>
+            <h1>Magnet<span>2</span>RD</h1>
+            <p>Convert magnet links to direct Real-Debrid links instantly.</p>
+        </header>
+
+        <section class="card glass">
+            <div class="input-group">
+                <label for="rd-token">Real-Debrid API Token</label>
+                <input type="password" id="rd-token" placeholder="Enter your RD API Token..." autocomplete="off">
+                <small>Find it at <a href="https://real-debrid.com/apitoken"
+                        target="_blank">real-debrid.com/apitoken</a>. Stored only in your browser.</small>
+            </div>
+
+            <div class="input-group">
+                <label for="magnet-link">Magnet Link</label>
+                <textarea id="magnet-link" rows="4" placeholder="Paste your magnet link here..."></textarea>
+            </div>
+
+            <button id="convert-btn" class="primary-btn">
+                <span class="btn-text">Generate Direct Link</span>
+                <span class="loader hidden"></span>
+            </button>
+        </section>
+
+        <section id="result-section" class="card glass hidden">
+            <h3>Download Ready!</h3>
+            <div class="result-details">
+                <p id="file-name" class="file-info"></p>
+                <div class="link-box">
+                    <input type="text" id="final-link" readonly>
+                    <button id="copy-btn">Copy</button>
+                </div>
+                <a id="download-btn" href="#" target="_blank" class="secondary-btn">Download Now</a>
+            </div>
+            <button id="reset-btn" class="text-btn">Convert Another</button>
+        </section>
+
+        <div id="status-container"></div>
+    </main>
+
+    <footer>
+        <p>&copy; 2025 <a href="https://nassoskranidiotis.com" target="_blank" style="color: var(--primary);">NassosKranidiotis</a>. All rights reserved.</p>
+    </footer>
+
+    <script type="module" src="app.js"></script>
+</body>
+
+</html>
