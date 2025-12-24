@@ -12,6 +12,8 @@ const copyBtn = document.getElementById('copy-btn');
 const downloadBtn = document.getElementById('download-btn');
 const resetBtn = document.getElementById('reset-btn');
 
+let useProxy = false;
+
 // Load token from localStorage
 const savedToken = localStorage.getItem('rd_token');
 if (savedToken) {
@@ -36,14 +38,20 @@ async function rdRequest(endpoint, method = 'GET', body = null) {
     localStorage.setItem('rd_token', token);
 
     const fullUrl = `${RD_API_BASE}${endpoint}`;
+
+    // If we've already detected CORS issues this session, go straight to proxy
+    if (useProxy) {
+        return await rdProxyRequest(fullUrl, method, body);
+    }
+
     const headers = { "Authorization": `Bearer ${token}` };
     const options = { method, headers };
 
     if (body) {
         options.body = new URLSearchParams(body);
+        options.headers['Content-Type'] = 'application/x-www-form-urlencoded';
     }
 
-    // Try Direct Request First
     try {
         const response = await fetch(fullUrl, options);
         if (!response.ok) {
@@ -53,30 +61,45 @@ async function rdRequest(endpoint, method = 'GET', body = null) {
         if (response.status === 204) return null;
         return await response.json();
     } catch (err) {
-        // If it's a CORS error (Failed to fetch), try the Proxy
+        // If it's a CORS error (Failed to fetch), enable sticky proxy
         if (err.message.includes('Failed to fetch') || err.message.includes('CORS')) {
-            console.warn("Direct request blocked by CORS, trying proxy...");
-            return await rdProxyRequest(fullUrl, options);
+            console.warn("Direct request blocked by CORS, activating sticky proxy...");
+            useProxy = true;
+            return await rdProxyRequest(fullUrl, method, body);
         }
         throw err;
     }
 }
 
 // Helper: Proxy Request Fallback
-async function rdProxyRequest(url, options) {
-    // Using corsproxy.io as a reliable public proxy
+async function rdProxyRequest(url, method, body) {
+    const token = rdTokenInput.value.trim();
+    // Using corsproxy.io as it's reliable and handles POST well
     const proxyUrl = `https://corsproxy.io/?${encodeURIComponent(url)}`;
+
+    const headers = {
+        "Authorization": `Bearer ${token}`
+    };
+
+    const options = { method, headers };
+
+    if (body) {
+        options.body = new URLSearchParams(body);
+        options.headers['Content-Type'] = 'application/x-www-form-urlencoded';
+    }
 
     try {
         const response = await fetch(proxyUrl, options);
         if (!response.ok) {
             const errData = await response.json().catch(() => ({}));
-            throw new Error(errData.error || `Proxy Error: ${response.status}`);
+            // Detailed error for debugging
+            throw new Error(errData.error || `Proxy Error: ${response.status} at ${url.split('/').pop()}`);
         }
         if (response.status === 204) return null;
         return await response.json();
     } catch (err) {
-        throw new Error("CORS Proxy failed. Please use a CORS-unblocking browser extension or try again later.");
+        console.error("Proxy Error Details:", err);
+        throw new Error(`CORS Proxy failed during ${url.split('/').pop()}. Please try again or use a browser extension.`);
     }
 }
 
@@ -100,11 +123,12 @@ async function convertMagnet() {
         showStatus("Step 2: Parsing metadata...");
         let info;
         let attempts = 0;
-        while (attempts < 15) {
-            info = await rdRequest(`/torrents/info/${torrentId}`);
+        while (attempts < 20) {
+            // Add cache busting for proxy
+            info = await rdRequest(`/torrents/info/${torrentId}?t=${Date.now()}`);
             if (info.status === 'waiting_files_selection') break;
             if (info.status === 'error') throw new Error("Real-Debrid error while parsing magnet.");
-            await new Promise(r => setTimeout(r, 1000));
+            await new Promise(r => setTimeout(r, 1500));
             attempts++;
         }
 
@@ -121,8 +145,8 @@ async function convertMagnet() {
         // 4. Get the link
         showStatus("Step 4: Generating download links...");
         // Wait a bit for processing
-        await new Promise(r => setTimeout(r, 2000));
-        info = await rdRequest(`/torrents/info/${torrentId}`);
+        await new Promise(r => setTimeout(r, 3000));
+        info = await rdRequest(`/torrents/info/${torrentId}?t=${Date.now()}`);
 
         if (!info.links || info.links.length === 0) {
             throw new Error("No links found for this torrent.");
