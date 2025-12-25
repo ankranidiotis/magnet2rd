@@ -10,6 +10,7 @@ load_dotenv()
 # --- CONFIGURATION ---
 RD_API_TOKEN = os.getenv("RD_API_TOKEN").strip()
 
+
 def download_video(url, destination_folder, filename):
     """Κατεβάζει το αρχείο με progress bar στο ορισμένο path."""
     # Δημιουργία φακέλου αν δεν υπάρχει
@@ -35,6 +36,7 @@ def download_video(url, destination_folder, filename):
             bar.update(size)
     
     print(f"\n[DONE] Download complete!")
+
 
 def get_direct_link(magnet_link, download_dir):
     headers = {"Authorization": f"Bearer {RD_API_TOKEN}"}
@@ -107,11 +109,24 @@ def get_direct_link(magnet_link, download_dir):
     else:
         print("Error: No links found. If this is a new torrent, it might still be downloading to Real-Debrid servers.")
 
+
 if __name__ == "__main__":
     magnet = input("Paste Magnet Link: ").strip()
-    folder = input("Enter Download Directory (e.g. ./downloads): ").strip()
-    
-    if not folder:
-        folder = "/home/media/movies/" # Default φάκελος αν πατήσεις Enter
+    print("\nSelect Download Directory:")
+    print("1. Movies")
+    print("2. TVShows")
+    print("3. Exit")
+    choice = input("Choice (1-3): ").strip()
+
+    if choice == "1":
+        folder = "/home/media/movies"
+    elif choice == "2":
+        folder = "/home/media/tvshows"
+    elif choice == "3":
+        print("Exiting...")
+        exit()
+    else:
+        print("Invalid choice, exiting.")
+        exit()
         
     get_direct_link(magnet, folder)
